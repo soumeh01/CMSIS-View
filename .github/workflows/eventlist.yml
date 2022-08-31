@@ -41,6 +41,13 @@ jobs:
           languages: go
           queries: security-and-quality
 
+      - name: Generate windows resources
+        if: github.event_name == 'release'
+        run: |
+          go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+          go generate
+        working-directory: ./tools/eventlist
+
       - name: Create build folder
         run: mkdir build
         working-directory: ./tools/eventlist
