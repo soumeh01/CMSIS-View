@@ -21,10 +21,13 @@ jobs:
       startsWith(github.ref, 'refs/tags/tools/eventlist/')
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        config:
+          - { os: macos-12, target: darwin64 }
+          - { os: windows-2019, target: windows64 }
+          - { os: ubuntu-20.04, target: linux64 }
         go: [1.17.x]
     name: 'Build'
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.config.os }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -41,22 +44,10 @@ jobs:
           languages: go
           queries: security-and-quality
 
-      - name: Create build folder
-        run: mkdir build
-        working-directory: ./tools/eventlist
-
-      - name: Generate version information
-        run: |
-          go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-          go generate
-        working-directory: ./tools/eventlist
-
       - name: Build executable
         run: |
-          GOOS=linux GOARCH=amd64 go build -o linux64/eventlist ./..
-          GOOS=darwin GOARCH=amd64 go build -o darwin64/eventlist ./..
-          GOOS=windows GOARCH=amd64 go build -o windows64/eventlist.exe ./..
-        working-directory: ./tools/eventlist/build
+          go run cmd/make/make.go build
+        working-directory: ./tools/eventlist
 
       - name: Perform CodeQL Analysis
         if: github.event_name != 'release'
@@ -65,24 +56,8 @@ jobs:
       - name: Archive eventlist
         uses: actions/upload-artifact@v2
         with:
-          name: eventlist-linux64
-          path: ./tools/eventlist/build/linux64
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Archive eventlist
-        uses: actions/upload-artifact@v2
-        with:
-          name: eventlist-darwin64
-          path: ./tools/eventlist/build/darwin64
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Archive eventlist
-        uses: actions/upload-artifact@v2
-        with:
-          name: eventlist-windows64
-          path: ./tools/eventlist/build/windows64
+          name: eventlist-{{ matrix.config.target }}
+          path: ./tools/eventlist/build
           retention-days: 1
           if-no-files-found: error
 
@@ -228,13 +203,9 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - name: Create build folder
-        run: mkdir build
-        working-directory: ./tools/eventlist
-
       - name: Check coverage
         run: |
-          go test ./... -coverprofile build/cover.out
+          go run cmd/make/make.go coverage
           test `go tool cover -func build/cover.out | tail -1 | awk '{print ($3 + 0)*10}'` -gt 980
         working-directory: ./tools/eventlist
 
