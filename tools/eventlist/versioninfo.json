@@ -1,19 +1,19 @@
 {
   "FixedFileInfo": {
     "FileVersion": {
-      "Major": 1,
+      "Major": 0,
       "Minor": 0,
-      "Patch": 10,
+      "Patch": 0,
       "Build": 0
     },
     "ProductVersion": {
-      "Major": 1,
+      "Major": 0,
       "Minor": 0,
-      "Patch": 10,
+      "Patch": 0,
       "Build": 0
     },
     "FileFlagsMask": "3f",
-    "FileFlags ": "00",
+    "FileFlags": "",
     "FileOS": "040004",
     "FileType": "01",
     "FileSubType": "00"
@@ -22,20 +22,132 @@
     "Comments": "",
     "CompanyName": "ARM Limited",
     "FileDescription": "",
-    "FileVersion": "1.0.10.0",
+    "FileVersion": "0.0.0",
     "InternalName": "eventlist",
     "LegalCopyright": "Copyright (C) 2022 ARM Limited or its Affiliates. All rights reserved.",
     "LegalTrademarks": "",
     "OriginalFilename": "eventlist",
     "PrivateBuild": "",
     "ProductName": "eventlist",
-    "ProductVersion": "1.0.10.0",
+    "ProductVersion": "0.0.0",
     "SpecialBuild": ""
   },
   "VarFileInfo": {
     "Translation": {
-      "LangID": "0409",
-      "CharsetID": "04B0"
+      "LangID": 1033,
+      "CharsetID": 1200
+    }
+  },
+  "Timestamp": false,
+  "Buffer": {},
+  "Structure": {
+    "WLength": 712,
+    "WValueLength": 52,
+    "WType": 0,
+    "SzKey": "VgBTAF8AVgBFAFIAUwBJAE8ATgBfAEkATgBGAE8A",
+    "Padding1": "AAAAAA==",
+    "Value": {
+      "DwSignature": 4277077181,
+      "DwStrucVersion": 65536,
+      "DwFileVersionMS": 0,
+      "DwFileVersionLS": 0,
+      "DwProductVersionMS": 0,
+      "DwProductVersionLS": 0,
+      "DwFileFlagsMask": 63,
+      "DwFileFlags": 0,
+      "DwFileOS": 262148,
+      "DwFileType": 1,
+      "DwFileSubtype": 0,
+      "DwFileDateMS": 0,
+      "DwFileDateLS": 0
+    },
+    "Padding2": "",
+    "Children": {
+      "WLength": 552,
+      "WValueLength": 0,
+      "WType": 1,
+      "SzKey": "UwB0AHIAaQBuAGcARgBpAGwAZQBJAG4AZgBvAA==",
+      "Padding": "AAA=",
+      "Children": {
+        "WLength": 516,
+        "WValueLength": 0,
+        "WType": 1,
+        "SzKey": "MAA0ADAAOQAwADQAQgAwAA==",
+        "Padding": "AAA=",
+        "Children": [
+          {
+            "WLength": 56,
+            "WValueLength": 12,
+            "WType": 1,
+            "SzKey": "QwBvAG0AcABhAG4AeQBOAGEAbQBlAA==",
+            "Padding": "AAAAAA==",
+            "Value": "QQBSAE0AIABMAGkAbQBpAHQAZQBkAAAA"
+          },
+          {
+            "WLength": 44,
+            "WValueLength": 6,
+            "WType": 1,
+            "SzKey": "RgBpAGwAZQBWAGUAcgBzAGkAbwBuAA==",
+            "Padding": "AAAAAA==",
+            "Value": "MAAuADAALgAwAAAA"
+          },
+          {
+            "WLength": 52,
+            "WValueLength": 10,
+            "WType": 1,
+            "SzKey": "SQBuAHQAZQByAG4AYQBsAE4AYQBtAGUA",
+            "Padding": "AAA=",
+            "Value": "ZQB2AGUAbgB0AGwAaQBzAHQAAAA="
+          },
+          {
+            "WLength": 180,
+            "WValueLength": 71,
+            "WType": 1,
+            "SzKey": "TABlAGcAYQBsAEMAbwBwAHkAcgBpAGcAaAB0AA==",
+            "Padding": "AAA=",
+            "Value": "QwBvAHAAeQByAGkAZwBoAHQAIAAoAEMAKQAgADIAMAAyADIAIABBAFIATQAgAEwAaQBtAGkAdABlAGQAIABvAHIAIABpAHQAcwAgAEEAZgBmAGkAbABpAGEAdABlAHMALgAgAEEAbABsACAAcgBpAGcAaAB0AHMAIAByAGUAcwBlAHIAdgBlAGQALgAAAAAA"
+          },
+          {
+            "WLength": 60,
+            "WValueLength": 10,
+            "WType": 1,
+            "SzKey": "TwByAGkAZwBpAG4AYQBsAEYAaQBsAGUAbgBhAG0AZQA=",
+            "Padding": "AAA=",
+            "Value": "ZQB2AGUAbgB0AGwAaQBzAHQAAAA="
+          },
+          {
+            "WLength": 52,
+            "WValueLength": 10,
+            "WType": 1,
+            "SzKey": "UAByAG8AZAB1AGMAdABOAGEAbQBlAA==",
+            "Padding": "AAAAAA==",
+            "Value": "ZQB2AGUAbgB0AGwAaQBzAHQAAAA="
+          },
+          {
+            "WLength": 48,
+            "WValueLength": 6,
+            "WType": 1,
+            "SzKey": "UAByAG8AZAB1AGMAdABWAGUAcgBzAGkAbwBuAA==",
+            "Padding": "AAA=",
+            "Value": "MAAuADAALgAwAAAA"
+          }
+        ]
+      }
+    },
+    "Children2": {
+      "WLength": 68,
+      "WValueLength": 0,
+      "WType": 1,
+      "SzKey": "VgBhAHIARgBpAGwAZQBJAG4AZgBvAA==",
+      "Padding": "AAAAAA==",
+      "Value": {
+        "WLength": 36,
+        "WValueLength": 4,
+        "WType": 0,
+        "SzKey": "VAByAGEAbgBzAGwAYQB0AGkAbwBuAA==",
+        "Padding": "AAAAAA==",
+        "Value": 78644233
+      }
     }
   },
   "IconPath": "",

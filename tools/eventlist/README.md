@@ -59,13 +59,8 @@ The commands below demonstrate how to build and create executable:
 
   - Go to root directory
     > cd \<**root**\>
-  - Create and switch to build directory
-    ```bash
-    mkdir build
-    cd build
-    ```
-  - Run go command to build an executable
-    > go build ./..
+  - Run go command to build an executable under **\<root\>/build** directory
+    > go run cmd/make/make.go build
 
 ## Run Tests
 
@@ -75,7 +70,7 @@ One can directly run the tests from command line.
   - Clean existing cache test results
     > go clean -cache
   - Run the executable
-    > go test ./...
+    > go run cmd/make/make.go test
 
 ## License
 
