@@ -290,14 +290,12 @@ jobs:
           tar -czvf eventlist-linux64.tar.gz  eventlist-linux64/eventlist eventlist-linux64/docs eventlist-linux64/LICENSE
           tar -czvf eventlist-darwin64.tar.gz eventlist-darwin64/eventlist eventlist-darwin64/docs eventlist-darwin64/LICENSE
         working-directory: release
-
       - name: Calculate checksums
         run: |
           sha256sum eventlist-windows64.zip --text > eventlist-checksums.txt
           sha256sum eventlist-linux64.tar.gz --text >> eventlist-checksums.txt
           sha256sum eventlist-darwin64.tar.gz --text >> eventlist-checksums.txt
         working-directory: release
-
       - name: Attach installer to release assets
         uses: svenstaro/upload-release-action@v2
         with:
