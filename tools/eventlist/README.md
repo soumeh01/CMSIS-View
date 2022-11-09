@@ -45,20 +45,20 @@ Note that some of the required tools are platform dependent:
 
 ## Clone repository
 
-Clone github repository to create a local copy on your computer to make
+Clone GitHub repository to create a local copy on your computer to make
 it easier to develop and test. Cloning of repository can be done by following
 the below git command:
 
 ```bash
-git clone git@github.com:Arm-Debug/eventlist.git
+git clone git@github.com:ARM-software/CMSIS-View.git
 ```
 
 ## Build components
 
 The commands below demonstrate how to build and create executable:
 
-  - Go to root directory
-    > cd \<**root**\>
+  - Go to eventlist directory
+    > cd \<**root**\>/tools/eventlist
   - Create and switch to build directory
     ```bash
     mkdir build
@@ -70,8 +70,8 @@ The commands below demonstrate how to build and create executable:
 ## Run Tests
 
 One can directly run the tests from command line.
-  - Go to root directory
-    > cd \<**root**\>
+  - Go to eventlist directory
+    > cd \<**root**\>/tools/eventlist
   - Clean existing cache test results
     > go clean -cache
   - Run the executable
@@ -80,3 +80,9 @@ One can directly run the tests from command line.
 ## License
 
 **eventlist** is licensed under Apache 2.0.
+
+## Log File Format
+
+The log file is expected to use the [Common Trace Format](https://diamon.org/ctf/#specification). The binary trace
+stream layout is describes using the *Trace Stream Description Language* (TSDL) in
+[eventlist.tsdl](docs/eventlist.tsdl).
