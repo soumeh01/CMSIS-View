@@ -35,11 +35,13 @@ Note that some of the required tools are platform dependent:
 - Platform specific command line terminal
   - **Windows:**
     - [GIT Bash](https://gitforwindows.org/)
-    ```
+
+    ```txt
     ☑️ Note:
         Make sure 'git' and 'bash' paths are listed under the PATH environment
         variable and set the git bash priority higher in the path.
     ```
+
   - **Linux/MacOS:**
     - GNU Bash (minimum recommended version **5.0.17**)
 
@@ -55,27 +57,44 @@ git clone git@github.com:ARM-software/CMSIS-View.git
 
 ## Build components
 
-The commands below demonstrate how to build and create executable:
+The steps below demonstrate how to build and create an executable:
 
-  - Go to eventlist directory
-    > cd \<**root**\>/tools/eventlist
-  - Create and switch to build directory
+- Go to eventlist directory
+  - cd \<**root**\>/tools/eventlist
+- Run command to build an executable under `build` directory
+  - `./make.sh build`                       : Build and generate executable for host OS.\
+  - `./make.sh build -arch <ARCH> -os <OS>` : Build and generate executable for provided configs.\
+    for e.g.
+
     ```bash
-    mkdir build
-    cd build
+    ./make.sh build -arch amd64 -os darwin
     ```
-  - Run go command to build an executable
-    > go build ./..
 
 ## Run Tests
 
-One can directly run the tests from command line.
-  - Go to eventlist directory
+One can directly run the tests from the command line.
+
+- Go to eventlist directory
     > cd \<**root**\>/tools/eventlist
-  - Clean existing cache test results
+- Clean existing cache test results
     > go clean -cache
-  - Run the executable
-    > go test ./...
+- Run command
+    > ./make.sh test
+
+## Code coverage
+
+User can get coverage and generate code coverage report in HTML format
+
+- Go to eventlist directory
+    > cd \<**root**\>/tools/eventlist
+- Run command
+  - `./make.sh coverage`        : Runs tests and shows coverage info.\
+  - `./make.sh coverage-report` : Runs tests with coverage info and generates HTML coverage report.
+
+```txt
+☑️ Note:
+   for more usable commands, Use `./make.sh -h`.
+```
 
 ## License
 

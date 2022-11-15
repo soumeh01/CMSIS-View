@@ -18,12 +18,10 @@
 
 package main
 
-//go:generate goversioninfo -gofile=versioninfo.go -arm=true
-
 import (
-	"eventlist/elf"
-	"eventlist/output"
-	"eventlist/xml/scvd"
+	"eventlist/pkg/elf"
+	"eventlist/pkg/output"
+	"eventlist/pkg/xml/scvd"
 	"flag"
 	"fmt"
 	"os"
@@ -31,6 +29,7 @@ import (
 )
 
 var Progname string
+var versionInfo string
 
 type includes []string
 
@@ -139,13 +138,14 @@ func main() {
 	}
 
 	if showVersion {
-		version := versionInfo.StringFileInfo.ProductVersion
-		i := strings.LastIndex(version, ".")
-		if i > 0 {
-			version = version[:i]
+		if versionInfo == "" {
+			versionInfo = "unknown"
 		}
-		fmt.Printf("%s: Version %s\n", Progname, version)
-		fmt.Printf("%s\n", versionInfo.StringFileInfo.LegalCopyright)
+		info := strings.Split(versionInfo, "#")
+		fmt.Printf("%s: Version %s\n", Progname, info[0])
+		if len(info) > 1 {
+			fmt.Printf("%s\n", info[1])
+		}
 		return
 	}
 
