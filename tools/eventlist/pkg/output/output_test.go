@@ -979,15 +979,7 @@ func TestOutput_print(t *testing.T) { //nolint:golint,paralleltest
 }
 
 func TestPrint(t *testing.T) { //nolint:golint,paralleltest
-	buildDir := "../../build"
-	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
-		err = os.Mkdir(buildDir, os.ModePerm)
-		if err != nil {
-			t.Errorf("Unable to create dirrctory '%v' error: %v", buildDir, err)
-			return
-		}
-	}
-	o1 := buildDir + "/testOutput.out"
+	o1 := "testOutput.out"
 
 	var s10 = "../../testdata/test10.binary"
 

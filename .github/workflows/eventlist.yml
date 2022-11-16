@@ -45,16 +45,6 @@ jobs:
           languages: go
           queries: security-and-quality
 
-      # - name: Create build folder
-      #   run: mkdir build
-      #   working-directory: ./tools/eventlist
-
-      # - name: Generate version information
-      #   run: |
-      #     go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-      #     go generate
-      #   working-directory: ./tools/eventlist
-
       - name: Build linux-amd64 executable
         run: |
           ./make.sh build -os linux -arch amd64 -outdir build/linux-amd64/eventlist
@@ -71,7 +61,6 @@ jobs:
           ./make.sh build -os darwin -arch arm64 -outdir build/darwin-arm64
           ./make.sh build -os windows -arch amd64 -outdir build/windows-amd64
         working-directory: ./tools/eventlist
-
 
       - name: Archive eventlist
         uses: actions/upload-artifact@v3

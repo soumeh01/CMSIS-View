@@ -48,7 +48,7 @@ Note that some of the required tools are platform dependent:
 ## Clone repository
 
 Clone GitHub repository to create a local copy on your computer to make
-it easier to develop and test. Cloning of repository can be done by following
+it easier to develop and test. Cloning of the repository can be done by following
 the below git command:
 
 ```bash
@@ -61,13 +61,13 @@ The steps below demonstrate how to build and create an executable:
 
 - Go to eventlist directory
   - cd \<**root**\>/tools/eventlist
-- Run command to build an executable under `build` directory
-  - `./make.sh build`                       : Build and generate executable for host OS.\
-  - `./make.sh build -arch <ARCH> -os <OS>` : Build and generate executable for provided configs.\
+- Run the command to build an executable under `build` directory
+  - `./make.sh build` : Build and generate executable for host OS & architecture in current directory.
+  - `./make.sh build -arch <ARCH> -os <OS> -outdir <OUT directory>` : Build and generate executable for provided configs.\
     for e.g.
 
     ```bash
-    ./make.sh build -arch amd64 -os darwin
+    ./make.sh build -arch amd64 -os darwin -outdir "Path/to/output/dir"
     ```
 
 ## Run Tests
@@ -75,21 +75,33 @@ The steps below demonstrate how to build and create an executable:
 One can directly run the tests from the command line.
 
 - Go to eventlist directory
-    > cd \<**root**\>/tools/eventlist
+  - cd \<**root**\>/tools/eventlist
 - Clean existing cache test results
-    > go clean -cache
+  - go clean -cache
 - Run command
-    > ./make.sh test
+  - `./make.sh test` : Run all tests.
+  - `./make.sh test <PACKAGE>` : Run test related to the specified package.\
+    for e.g.
+
+    ```bash
+    ./make.sh test eventlist/pkg/event
+    ```
 
 ## Code coverage
 
-User can get coverage and generate code coverage report in HTML format
+Users can get coverage and generate code coverage report in HTML format
 
 - Go to eventlist directory
     > cd \<**root**\>/tools/eventlist
 - Run command
-  - `./make.sh coverage`        : Runs tests and shows coverage info.\
-  - `./make.sh coverage-report` : Runs tests with coverage info and generates HTML coverage report.
+  - `./make.sh coverage`        : Run tests and show coverage info.\
+  - `./make.sh coverage -html <FILE path>` : Run tests with coverage info and generate specified HTML coverage report.\
+
+    for e.g.
+
+    ```bash
+    ./make.sh coverage -html cov/coverage.html
+    ```
 
 ```txt
 ☑️ Note:

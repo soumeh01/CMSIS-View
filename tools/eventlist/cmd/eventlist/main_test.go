@@ -164,7 +164,7 @@ func Test_main(t *testing.T) { //nolint:golint,paralleltest
 			"\\t-s --statistic\\tshow statistic only\\n" +
 			"\\t-V --version\\tshow version info\\n"
 
-	versionInfo = "1.2.3#Copyright (C) 2022 ARM Limited or its Affiliates. All rights reserved."
+	versionInfo = "1.2.3 (C) 2022 Arm Ltd. and Contributors"
 	tests := []struct {
 		name       string
 		args       []string
@@ -181,8 +181,8 @@ func Test_main(t *testing.T) { //nolint:golint,paralleltest
 		{"-o -b", []string{"-b", "-o", outFile, "../../testdata/test10.binary"}, "\\[.*\\]\\n", outFile},
 		{"-o", []string{"-o", outFile, "../../testdata/test10.binary"}, "\\[.*\\]\\n", outFile},
 		{"-o", []string{"-o", outFile, "../../testdata/nix"}, ".*: cannot open event file\\n", outFile},
-		{"-V", []string{"-V"}, ".*: Version [0-9]+\\.[0-9]+\\.[0-9]+\\nCopyright \\(C\\) [0-9]+ ARM Limited or its Affiliates\\. All rights reserved\\.\\n", ""},
-		{"-version", []string{"-version"}, ".*: Version [0-9]+\\.[0-9]+\\.[0-9]+\\nCopyright \\(C\\) [0-9]+ ARM Limited or its Affiliates\\. All rights reserved\\.\\n", ""},
+		{"-V", []string{"-V"}, ".* [0-9]+\\.[0-9]+\\.[0-9]+ \\(C\\) [0-9]+ Arm Ltd. and Contributors\\n", ""},
+		{"-version", []string{"-version"}, ".* [0-9]+\\.[0-9]+\\.[0-9]+ \\(C\\) [0-9]+ Arm Ltd. and Contributors\\n", ""},
 		{"err", []string{"xxx", "yyy"}, ".*: only one binary input file allowed\n", ""},
 		{"missing", nil, ".*: missing input file\n", ""},
 		// -I must be the last test

@@ -138,14 +138,7 @@ func main() {
 	}
 
 	if showVersion {
-		if versionInfo == "" {
-			versionInfo = "unknown"
-		}
-		info := strings.Split(versionInfo, "#")
-		fmt.Printf("%s: Version %s\n", Progname, info[0])
-		if len(info) > 1 {
-			fmt.Printf("%s\n", info[1])
-		}
+		fmt.Printf("%s %s\n", Progname, versionInfo)
 		return
 	}
 

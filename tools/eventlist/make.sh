@@ -10,20 +10,22 @@
 usage() {
   echo ""
   echo "Usage:"
-  echo "  make.sh <command> [<args>]"
+  echo "  make.sh <command> [OPTIONS...]"
   echo ""
   echo "commands:"
   echo "  build           : Build executable"
-  echo "  clean           : Remove build artifacts"
   echo "  coverage        : Run tests with coverage info"
-  echo "  coverage-report : Generate html coverage report"
   echo "  format          : Align indentation and format code"
   echo "  lint            : Run linter"
   echo "  test            : Run all tests"
   echo ""
-  echo "args:"
-  echo "  -arch           : Target architecture for e.g amd64 etc"
-  echo "  -os             : Target operating system for e.g windows, linux, darwin etc"
+  echo "build options:"
+  echo "  -arch arg       : Optional target architecture for e.g amd64 etc [default: host arch]"
+  echo "  -os arg         : Optional target operating system for e.g windows, linux, darwin etc [default: host OS]"
+  echo "  -outdir arg     : Optional output directory for executable generation [default: current directory]"
+  echo ""
+  echo "coverage options:"
+  echo "  -html arg       : Coverage file path"
 }
 
 if [ $# -eq 0 ]
