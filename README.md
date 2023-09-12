@@ -1,22 +1,24 @@
 # CMSIS-View
 
-The [**Keil MDK Event Recorder**](https://www2.keil.com/mdk5/debug) is now available as open source component along with tooling.
+The [**Keil MDK Event Recorder**](https://developer.arm.com/documentation/101407/latest/Debugging/Debug-Windows-and-Dialogs/Event-Recorder) is now available as open source component along with tooling.
 This repository contains the source code of:
-  - [**ARM::CMSIS-View**](https://arm-software.github.io/CMSIS-View/main/index.html) software pack that provides the event recorder software component.
-  - [**EventList**](./tools/eventlist) command line utility that allows to dump the events on command line.
-  - [**Example Projects**](./Examples) that show the usage of the Event Recorder.
+
+- [**ARM::CMSIS-View**](https://arm-software.github.io/CMSIS-View/main/index.html) software pack that provides the Event Recorder and Fault software components.
+- [**EventList**](./tools/eventlist) command line utility that allows to dump the events on command line.
+- [**Example Projects**](./Examples) that show the usage of the Event Recorder and Fault components.
 
 ## Repository toplevel structure
 
-```
+```txt
     📦
     ┣ 📂 .github          GitHub Action workflow and configuration
     ┣ 📂 Documentation    Target directory for generated documentation
     ┣ 📂 Doxygen          Source directory for documentation
     ┣ 📂 EventRecorder    Source code of EventRecorder software component
-    ┣ 📂 Examples         Usage examples of the EventRecorder component
-    ┣ 📂 tools            EventList command line tool source code
-    ┗ 📂 Scripts          Helper scripts
+    ┣ 📂 Examples         Usage examples
+    ┣ 📂 Fault            Source code of Fault software component
+    ┣ 📂 Schema           Schema files
+    ┗ 📂 tools            EventList command line tool source code
 ```
 
 ## Generating Software Pack
@@ -27,26 +29,28 @@ Some helper scripts are provided to generate the release artifacts from this rep
 
 Generating the HTML-formatted documentation from its Doxygen-based source is done via
 
-```bash
+```sh
 CMSIS-View $ ./Doxygen/gen_doc.sh
-``` 
+```
 
 Prerequisites for this script to succeed are:
- - Doxygen 1.9.2
+
+- Doxygen 1.9.2
 
 ### CMSIS-Pack Bundle
 
 The CMSIS-Pack bundle can be generated with
 
-```bash
+```sh
 CMSIS-View $ ./gen_pack.sh
-``` 
+```
 
 Prerequisites for this script to succeed are:
- - Generated documentation (see above)
- - 7z
- - packchk
- - xmllint (optional)
+
+- Generated documentation (see above)
+- 7z/GNU Zip
+- packchk (e.g., via CMSIS-Toolbox)
+- xmllint (optional)
 
 ### Version and Changelog Inference
 
@@ -54,51 +58,81 @@ The version and changelog embedded into the documentation and pack are inferred 
 local Git history. In order to get the full changelog one needs to have a full clone (not
 a shallow one) including all release tags.
 
-One can check the inferred version by calling the helper script:
+The version numbers and change logs are taken from the available annotated tags.
 
-```bash
-CMSIS-View $ ./Scripts/git_describe.sh
-Git version: '1.2.4-dev5+g6a00f35'
-1.2.4-dev5+g6a00f35
-^ ^ ^    ^ ^
-| | |    | ┗ Commit SHA of the commit used for generation
-| | |    ┗ Number of commits added since latest tag
-| | ┗ Patch version from the latest tag incremented by one
-| ┗ Minor version as in the latest tag
-┗ Major version as in the latest tag
-``` 
+### Release Pack
 
-The full changelog can be inspected by calling the helper script:
+A release is simply done via the GitHub Web UI. The newly created tag needs to have
+the pattern `pack/<version>` where `<version>` shall be the SemVer `<major>.<minor>.<patch>`
+version string for the release. The release description is used as the change log
+message for the release.
 
-```bash
-CMSIS-View $ ./Scripts/gen_changelog.sh [-h] [-f <format>]
-Generating changelog ...
-Git version: '1.2.4-dev5+g6a00f35'
-1.2.3 (2022-07-28)
-- EventRecorder
-  - Change 1
-  - Change 2
-- EventList
-  - Change 1
-  - Change 2
-1.1.1 (2022-03-31)
-Added clock frequency to internal Event Recorder Initialization message
-1.1.0 (2022-02-25)
-Added Event Recorder logging via Semihosting
-1.0.0 (2021-01-28)
-Add EventRecorder component
+When using an auto-generated tag (via Web UI) the release description is used as the
+annotation message for the generated tag. Alternatively, one can prepare the release
+tag in the local clone and add the annotation message independently from creating the
+release.
+
+Once the release is published via the GitHub Web UI the release workflow generates the
+documentation and the pack (see above) and attaches the resulting pack archive as an
+additional asset to the release.
+
+## EventList Utility
+
+The command line utility to decode EventRecorder log files written in Go.
+
+### Compile and Test
+
+To build and EventList run `make.sh` script.
+
+```sh
+CMSIS-View/tools/eventlist $ ./make.sh build
+GOOS=windows GOARCH=amd64 go build -v -ldflags '-X "..."' -o ./eventlist.exe ./cmd/eventlist
+
+build finished successfully!
+
+CMSIS-View/tools/eventlist $ ./make.sh test
+go test ./...
+?       eventlist/cmd/make      [no test files]
+ok      eventlist/cmd/eventlist 7.584s
+ok      eventlist/pkg/elf       6.802s
+ok      eventlist/pkg/eval      7.458s
+ok      eventlist/pkg/event     7.471s
+ok      eventlist/pkg/output    7.645s
+ok      eventlist/pkg/xml/scvd  6.808s
 ```
 
-The version numbers are taken from the available tags. The shown release dates and
-changelogs are one of:
+One can run cross-builds for other than the own host platform by specifying `-arch <arch>`
+and/or `-os <os>` on the `make.sh` command line, see `--help` for details.
 
-1. For annotated tags the tagger date and the associated message is used.
-2. For simple tags the committer date and message of the pointed-to commit is used.
+### Release
 
+A release for EventList utility is done independently from the CMSIS-View pack via
+the GitHub Web UI. The release tag must match the pattern `tools/eventlist/<version>`
+where `<version>` is a SemVer string.
 
-## License
+The GitHub Action release workflow is triggered once a release is published. The
+workflow builds release bundles for all supported target platforms and attaches
+them as assets to the release.
 
-CMSIS-View is licensed under Apache 2.0.
+## License Terms
+
+CMSIS-View is licensed under [Apache License 2.0](LICENSE).
+
+### Note
+
+Individual files contain the following tag instead of the full license text.
+
+SPDX-License-Identifier: Apache-2.0
+
+This enables machine processing of license information based on the SPDX License Identifiers that are here available: http://spdx.org/licenses/
+
+### External Dependencies
+
+The components listed below are not redistributed with the project but are used internally for building, development, or testing purposes.
+
+| Component | Version | License | Origin | Usage |
+| --------- | ------- | ------- | ------ | ----- |
+|goversioninfo|n/a|[MIT](https://opensource.org/licenses/MIT)|https://github.com/josephspurrier/goversioninfo| Used in [eventlist](./tools/eventlist) to generate MS Windows version info |
 
 ## Contributions and Pull Requests
 

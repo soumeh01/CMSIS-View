@@ -1,0 +1,51 @@
+project:
+
+  processor:
+    trustzone: non-secure
+
+  packs:
+    - pack: ARM::CMSIS
+    - pack: ARM::CMSIS-Compiler
+    - pack: ARM::CMSIS-View
+
+  groups:
+    - group: Documentation
+      files:
+        - file: ../README.md
+
+    - group: Source Files
+      files:
+        - file: Fault.c
+        - file: ARM_FaultTrigger.c
+        - file: ARM_FaultPrint.c
+        - file: retarget_stdio.c
+
+    - group: CMSE_Library
+      files:
+        - file: $cmse-lib(Fault_S)$
+
+  components:
+    - component: CMSIS:CORE
+    - component: CMSIS:RTOS2:Keil RTX5&Source_NS
+
+    - component: CMSIS-Compiler:I/O:STDERR&User
+    - component: CMSIS-Compiler:I/O:STDOUT&User
+    - component: CMSIS-Compiler:I/O:STDIN&User
+
+    - component: CMSIS-View:Event Recorder&DAP
+    - component: CMSIS-View:Fault:Record
+    - component: CMSIS-View:Fault:Storage
+
+    - component: Device:STM32Cube Framework:STM32CubeMX
+
+    - component: Device:STM32Cube HAL:Common
+    - component: Device:STM32Cube HAL:Cortex
+    - component: Device:STM32Cube HAL:DMA
+    - component: Device:STM32Cube HAL:Flash
+    - component: Device:STM32Cube HAL:GPIO
+    - component: Device:STM32Cube HAL:GTZC
+    - component: Device:STM32Cube HAL:PWR
+    - component: Device:STM32Cube HAL:RCC
+    - component: Device:STM32Cube HAL:UART
+
+    - component: Device:Startup&Source C

@@ -1,25 +1,26 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/Open-CMSIS-Pack/devtools/schemas/projmgr/0.9.4/tools/projmgr/schemas/cproject.schema.json
-
 project:
-  # packs:
-  #   - pack: ARM::CMSIS
 
-  components:
-    - component: ARM::Device:Definition
-    - component: ARM::Device:Startup&Baremetal
-
-    - component: ARM::CMSIS:CORE
-
-    - component: Keil::Compiler&ARM Compiler:Event Recorder&Semihosting
+  packs:
+    - pack: ARM::CMSIS
+    - pack: ARM::CMSIS-View
 
   groups:
     - group: Documentation
-      files: 
-        - file: ./README.md
-    - group: main
       files:
-        - file: ./main.c
-    - group: ScatterFile
+        - file: README.md
+
+    - group: Source Files
       files:
-        - file: ./RTE/Device/SSE-300-MPS3/fvp_sse300_mps3_s.sct
-      
+        - file: main.c
+
+  components:
+    - component: CMSIS:CORE
+
+    - component: CMSIS-View:Event Recorder&Semihosting
+
+    - component: Native Driver:Timeout
+    - component: Native Driver:SysCounter
+    - component: Native Driver:SysTimer
+
+    - component: Device:Definition
+    - component: Device:Startup&Baremetal

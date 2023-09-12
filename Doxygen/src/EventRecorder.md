@@ -1,4 +1,4 @@
-# Event Recorder {#evr}
+﻿# Event Recorder {#evr}
 
 ## Overview {#about_evr}
 
@@ -10,7 +10,7 @@ of the debugger.
 
 During program execution, the debugger reads the content of the **event buffer** using a standard debug unit that is connected via JTAG or SWD to the CoreSight Debug Access Port (DAP). The **Event Recorder** requires no trace hardware and can be therefore used on any Cortex-M processor.
 
-![Event Recorder](./images/EventRecorderOverview.png "Event Recorder")
+![Event Recorder](./images/EventRecorderOverview.png "Event Recorder block diagram with exemplary output in an IDE")
 
 - \subpage er_theory explains in details how the Event Recorder collects event data, generates time stamps, and transfers this information via a debug unit to a host computer.
 - \subpage er_use provides instructions on how to enable Event Recorder in a project.
@@ -18,29 +18,29 @@ During program execution, the debugger reads the content of the **event buffer**
 **Benefits of the Event Recorder:**
  - Visibility to the dynamic execution of an application at little (memory) cost.
  - Adding RTOS awareness to a development tool does not require complex DLL programming.
- - For Arm Cortex-M3/M4/M7/M33 processor based devices, Event Recorder functions will not disable interrupts.
+ - For Arm Cortex-M3/M4/M7/M33/M55/M85 processor based devices, Event Recorder functions will not disable interrupts.
  - Adding \ref printf_redirect "printf re-targeting" for devices without
-   <a href="http://www2.keil.com/coresight/#swv">ITM</a>, such as Arm Cortex-M0/M0+/M23.
- - Fast time-deterministic execution of event recorder functions with minimal code and timing overhead.  
+   ITM, such as Arm Cortex-M0/M0+/M23.
+ - Fast time-deterministic execution of event recorder functions with minimal code and timing overhead.
  - No need for a debug or release build as the event annotations can remain in production code.
  - Saving the event data in local memory ensures fast recording.
  - Collecting the data from the on-chip memory is done using simple read commands. These commands work on all Cortex-M
-   processor based devices and require only <a href="http://www2.keil.com/coresight/#jtag">JTAG</a> or
-   <a href="http://www2.keil.com/coresight/#swd">SWD</a> connectivity to the debug adapter.
- - Using the DWT Cycle Count register for creating time stamps reduces code overhead (available on Arm Cortex-M3/M4/M7/M33).
+   processor based devices and require only JTAG or
+   SWD connectivity to the debug adapter.
+ - Using the DWT Cycle Count register for creating time stamps reduces code overhead (available on Arm Cortex-M3/M4/M7/M33/M55/M85).
 
 \page er_theory Theory of operation
 
 This section describes how the **Event Recorder** collects event data, generates time stamps, and transfers this information via a debug unit to a host computer.
 
 The **Event Recorder** is implemented in the target application using the software component
-**Compiler:Event Recorder** which adds the source file *EventRecorder.c* to the application. Each event is stored in a 16-byte structure that is composed of a 16-bit *id*, 32-bit time stamp, two 32-bit data values and consistency check values.
+**CMSIS-View:Event Recorder** which adds the source file *EventRecorder.c* to the application. Each event is stored in a 16-byte structure that is composed of a 16-bit *id*, 32-bit time stamp, two 32-bit data values and consistency check values.
 
-To store these events, a circular buffer is provided that can store a minimum of 8 events. The size of this circular buffer is configurable with the 
+To store these events, a circular buffer is provided that can store a minimum of 8 events. The size of this circular buffer is configurable with the
 `#define EVENT_RECORD_COUNT`.
 
 ## Event id {#event_id}
- 
+
 The \ref EventRecorder_Data functions get a parameter `id` that is composed of *level*, *component number*, and *message number* as shown below:
 
 | *id*               | bits   | Description
@@ -55,8 +55,8 @@ The *level* specifies the category of the event message and can be used for filt
 | *level*                    | Message relates to ...
 |----------------------------|----------------------------------------------------
 | \ref EventLevelError = 0   | Run-time error
-| \ref EventLevelAPI = 1     | API function call 
-| \ref EventLevelOp = 2      | Internal operation 
+| \ref EventLevelAPI = 1     | API function call
+| \ref EventLevelOp = 2      | Internal operation
 | \ref EventLevelDetail = 3  | Additional detailed information of operations
 
 The *component number* specifies the software component that the event message belongs to and can be also used for filtering:
@@ -65,7 +65,8 @@ The *component number* specifies the software component that the event message b
 |---------------------------|----------------------------------------------------
 | 0x0  .. 0x3F (0 .. 63)    | software components of the user application
 | 0x40 .. 0x7F (64 .. 127)  | third party middleware components
-| 0x80 .. 0xEE (128 .. 238) | MDK middleware components
+| 0x80 .. 0xED (128 .. 237) | MDK-Middleware components
+| 0xEE (238)                | Fault component
 | 0xEF (239)                | Start/Stop events for Event Statistic information
 | 0xF0 .. 0xFC (240 .. 253) | RTOS kernel
 | 0xFD (253)                | Inter-process communication layer (multiprocessor systems)
@@ -79,15 +80,18 @@ The following sections describe:
 
 ## Configuration {#er_config}
 
-Selecting the software component **Compiler:Event Recorder** to a project will add the file *EventRecorderConf.h* that is used to define the configuration parameters of the <b>Event Recorder</b>. It uses <a class="el" href="http://www.keil.com/pack/doc/CMSIS/Pack/html/configWizard.html" target="_blank">Configuration Wizard Annotations</a> that show a graphical representation of the settings in MDK:
+Adding the software component **CMSIS-View:Event Recorder** to a project will copy the file *EventRecorderConf.h* into the project that is used to define the configuration parameters of the **Event Recorder**. It uses [Configuration Wizard Annotations](https://open-cmsis-pack.github.io/Open-CMSIS-Pack-Spec/main/html/configWizard.html).
+
+For example, IDEs can show a graphical representation of the settings:
 
 ![EventRecorderConf.h in Configuration Wizard View](./images/config_wizard.png "EventRecorderConf.h in Configuration Wizard View")
-<br/>
+&nbsp;
+
 
 |Option                              |\#define                 |Description
 |------------------------------------|-------------------------|-----------
 |Number of Records                   |`EVENT_RECORD_COUNT`     |Specifies the number or records stored in the Event Record Buffer. Each record is 16 bytes.
-|Time Stamp Source                   |`EVENT_TIMESTAMP_SOURCE` |Specifies the timer that is used as time base. Refer to <b>Time stamp source</b> below for more information.
+|Time Stamp Source                   |`EVENT_TIMESTAMP_SOURCE` |Specifies the timer that is used as time base. Refer to **Time stamp source** below for more information.
 |Time Stamp Clock Frequency [Hz]     |`EVENT_TIMESTAMP_FREQ`   |Specifies the initial timer clock frequency.
 
 \note
@@ -111,7 +115,7 @@ The following time stamp sources can be selected:
   Invalid Time Stamp Source selected in EventRecorderConf.h!
   ```
 - When using the **CMSIS-RTOS2 System Timer**, it is strongly recommended to set up the
-  <b>Time Stamp Clock Frequency [Hz]</b> (see above) to the correct value to avoid display problems in the Event Recorder
+  **Time Stamp Clock Frequency [Hz]** (see above) to the correct value to avoid display problems in the Event Recorder
   and System Analyzer windows.
 
 ### Configure for targets without DWT Cycle Counter{#noDWT}
@@ -126,8 +130,6 @@ For applications that do not use the SysTick timer, you may configure EventRecor
 #define EVENT_TIMESTAMP_FREQ    25000000U     // processor core clock (input frequency to SysTick)
 ```
 
-The example project \ref scvd_CM0_SysTick shows this configuration.
-
 **CMSIS-RTOS2 System Timer**
 
 For applications that use a CMSIS-RTOS2 compliant RTOS (SysTick timer used by RTOS), you may configure EventRecorderConf.h with:
@@ -136,50 +138,47 @@ For applications that use a CMSIS-RTOS2 compliant RTOS (SysTick timer used by RT
 #define EVENT_TIMESTAMP_FREQ    25000000U     // processor core clock (input frequency to SysTick)
 ```
 
-The example project \ref scvd_CM0_RTOS shows this configuration.
-
 ### DWT Cycle Counter with µVision simulator{#simulation}
 
 The DWT Cycle Counter can be simulated with the following debug initialization file, for example Debug_Sim.ini:
 ```
 MAP 0xE0001000, 0xE0001007 READ WRITE
- 
+
 signal void DWT_CYCCNT (void) {
   while (1) {
     rwatch(0xE0001004);
     _WWORD(0xE0001004, states);
   }
 }
- 
+
 DWT_CYCCNT()
 ```
 
-Refer to the \ref MyComponent to see how it is used in a µVision project.
-
 ## Resource requirements{#er_req}
 
-**Technical data of Event Recorder firmware**
+### Technical data of Event Recorder firmware
 
 Target: Cortex-M3 using DWT cycle counter as timer
 
-|Parameter                         | ARMCC V5.06  | ARMCC V5.06  | ARMCC V6.13.1 | ARMCC V6.13.1
-|:---------------------------------|--------------|--------------|---------------|--------------
-|Compiler options                  | -O3          | -O3 -Otime   | -Os           | -O3
-|ROM size                          | < 1.5k bytes | < 2.0k bytes | < 1.7k bytes  | < 3.4k bytes
-|RAM size @8 records (min)         | 292 bytes    | 292 bytes    | 292 bytes     | 292 bytes
-|RAM size @64 records (default)    | 1188 bytes   | 1188 bytes   | 1188 bytes    | 1188 bytes 
-|\ref EventRecord2 (id+8bytes)     | 256 cycles   | 238 cycles   | 197 cycles    | 184 cycles 
-|\ref EventRecord4 (id+16bytes)    | 448 cycles   | 429 cycles   | 343 cycles    | 319 cycles 
-|\ref EventRecordData (id+8bytes)  | 346 cycles   | 307 cycles   | 276 cycles    | 252 cycles 
-|\ref EventRecordData (id+16bytes) | 540 cycles   | 507 cycles   | 425 cycles    | 397 cycles 
-|\ref EventRecordData (id+24bytes) | 714 cycles   | 683 cycles   | 554 cycles    | 519 cycles 
-|\ref EventRecordData (id+32bytes) | 888 cycles   | 862 cycles   | 685 cycles    | 643 cycles 
+|Parameter                         | ARMCC V6.13.1 | ARMCC V6.13.1
+|:---------------------------------|---------------|--------------
+|Compiler options                  | -Os           | -O3
+|ROM size                          | < 1.7k bytes  | < 3.4k bytes
+|RAM size @8 records (min)         | 292 bytes     | 292 bytes
+|RAM size @64 records (default)    | 1188 bytes    | 1188 bytes
+|\ref EventRecord2 (id+8bytes)     | 197 cycles    | 184 cycles
+|\ref EventRecord4 (id+16bytes)    | 343 cycles    | 319 cycles
+|\ref EventRecordData (id+8bytes)  | 276 cycles    | 252 cycles
+|\ref EventRecordData (id+16bytes) | 425 cycles    | 397 cycles
+|\ref EventRecordData (id+24bytes) | 554 cycles    | 519 cycles
+|\ref EventRecordData (id+32bytes) | 685 cycles    | 643 cycles
 
-\note ROM size is specified for image with all Event Recorder functions being used.
-\note RAM size can be calculated as `164 + 16 * <Number of Records> (defined by EVENT_RECORD_COUNT in EventRecorderConf.h)`.
-\note Timing measured in simulator (zero cycle memory, no interrupts). Function parameter in application is not considered.
+\note
+- ROM size is specified for image with all Event Recorder functions being used.
+- RAM size can be calculated as `164 + 16 * <Number of Records> (defined by EVENT_RECORD_COUNT in EventRecorderConf.h)`.
+- Timing was measured in simulator (zero cycle memory, no interrupts). Function parameter in application is not considered.
 
-**Usage of records by Event Recorder functions**
+### Usage of records by Event Recorder functions
 
 |Function                          | Number of Records used
 |:---------------------------------|-----------------------------
@@ -187,9 +186,10 @@ Target: Cortex-M3 using DWT cycle counter as timer
 |\ref EventRecord4                 | 2
 |\ref EventRecordData              | (event data length + 7) / 8
 
+
 \page er_use Using Event Recorder
 
-The following steps enable the MDK debugger views for static information \a and dynamic events.
+\note The following steps explain how to enable views for static information \a and dynamic events in the µVision debugger. Other tools might use different ways to accomplish this.
 
 **For User Code:**
   -# \ref Add_Event_Recorder.
@@ -199,9 +199,9 @@ The following steps enable the MDK debugger views for static information \a and 
   -# Add \ref Event_Annotations in the C source to be able to stream dynamic event information.
   -# Create an \ref SCVD_Format "SCVD file" to \ref Format_Event_Information that matches with application code.
 
-**For MDK-Middleware, Keil RTX5, and FreeRTOS:**
+**For Pre-annotated Software Components:**
 
-The software packs for MDK Middleware, CMSIS, CMSIS-FreeRTOS already contain the relevant *.SCVD files and the related event annotations in the C source code.
+The software packs for MDK-Middleware, CMSIS, CMSIS-FreeRTOS already contain the relevant *.SCVD files and the related event annotations in the C source code.
 
   -# \ref Add_Event_Recorder to the project.
   -# Select a \ref Debug_Variants "Debug" variant for the middleware component to enable event information (for RTX5 select **Source** variant).
@@ -209,20 +209,20 @@ The software packs for MDK Middleware, CMSIS, CMSIS-FreeRTOS already contain the
 ## Add Event Recorder Component{#Add_Event_Recorder}
 
 To use the Event Recorder in an application, you need to:
-  - Select the software component <b>Compiler:Event Recorder</b> using the RTE management dialog.<br/>
+  - Select the software component **CMSIS-View:Event Recorder** using the RTE management dialog.<br/>
     ![Select Event Recorder](./images/SelEventRecorder.png)
     \note Usually, you select the **DAP** variant. If you are using a simulation model (FastModel or Arm Virtual Hardware),
     you can select \ref er_semihosting to write the Event Recorder data into a file on the PC.
   - Include the EventRecorder.h header file and add the event recorder initialization function to the source code:
-  ```
+  ```C
     :
-  #include "EventRecorder.h"                        // Keil::Compiler:Event Messaging
+  #include "EventRecorder.h"                        // ARM::CMSIS-View:Event Recorder
     :
   int main (void) {
     :
     HAL_Init();                                     // configure hardware abstraction layer
-    SystemClock_Config();                           // configure system clock 
-    MemoryBus_Config();                             // configure external memory bus    
+    SystemClock_Config();                           // configure system clock
+    MemoryBus_Config();                             // configure external memory bus
     EventRecorderInitialize (EventRecordAll, 1);    // initialize and start Event Recorder
     :
     // other application code
@@ -232,15 +232,14 @@ To use the Event Recorder in an application, you need to:
 \note
 - By default, the Event Recorder uses the DWT Cycle Counter as a time stamp source. This is not available on Cortex-M0/M0+/M23.
   Change the \ref er_config "configuration" to use an alternative timer instead.
-- For Keil RTX5 (version 5.4.0 and above), no call to \ref EventRecorderInitialize is required. Instead enable <b>Event Recorder Configuration - Global Initialization</b> in the RTX_Config.h file. Refer to the
+- For Keil RTX5 (version 5.4.0 and above), no call to \ref EventRecorderInitialize is required. Instead enable **Event Recorder Configuration - Global Initialization** in the RTX_Config.h file. Refer to the
   <a target="_blank" href="https://arm-software.github.io/CMSIS_5/RTOS2/html/rtx5_impl.html">CMSIS-RTOS2 - RTX v5 Implementation</a> for
   more information.
 
 ## Locate Event Recorder in uninitialized memory{#place_uninit_memory}
 
 For uninterrupted recording of program resets, the RAM for the Event Recorder component should be placed to a memory
-region that is not cleared (or initialized) by a system restart (reset), and which differs from the RAM area that is used for
-Flash programming.
+region that is not cleared (or initialized) by a system restart (reset).
 
 \note Make sure that you use normal, non-cacheable, and non-shareable memory for Event Recorder data.
 
@@ -252,30 +251,67 @@ The memory required for the Event Recorder data is calculated with the formula:
 ```
 In this example we configure `0x800` bytes (as it is easier) which can hold more than 64 records.
 
-### Create memory region{#evr_create_mem}
+### Create memory region {#evr_create_mem}
 
-To setup this uninitialized RAM, use either a
-<a href="https://developer.arm.com/documentation/101754/latest/armlink-Reference/Scatter-loading-Features" target="_blank">linker script</a>
-or configure it in µVision following these steps:
+To setup this uninitialized RAM, use either \ref evr_create_mem_ls or \ref evr_create_mem_uv procedure.
+
+#### Create memory region using linker script {#evr_create_mem_ls}
+
+If the linker script does not contain provisions for uninitialized memory section then, for respective toolchain, add the necessary section like described below:
+
+##### Arm Compiler {#evr_create_mem_ls_ac}
+
+for the **Arm Compiler** toolchain add the following code snippet to the linker script (.sct file), in the part specifying RAM sections (usually before Heap section):
+
+  ```
+  RW_NOINIT <start_address> UNINIT 0x800 {
+    * (.bss.noinit*)
+  }
+  ```
+
+> Note: \<start_address\> is the physical address in RAM where the section will start
+
+> Note: 0x800 is the size of the section, adjust that as necessary
+   
+##### GCC {#evr_create_mem_ls_gcc}
+
+for the **GCC** toolchain add the following code snippet to the linker script (.ld file), in the part specifying RAM sections (usually before Heap section):
+
+  ```
+  .noinit (NOLOAD) :
+  {
+    . = ALIGN(4);
+    PROVIDE (__noinit_start = .);
+    *(.noinit*)
+    . = ALIGN(4);
+    PROVIDE (__noinit_end = .);
+  } > RAM
+  ```
+
+> Note: this code snippet expects defined RAM memory region, if RAM region is not defined then adapt the script accordingly
+
+### Create memory region using µVision {#evr_create_mem_uv}
+
+To setup this uninitialized RAM in the µVision, follow the steps below:
 
 1. In the **Options for Target** dialog, on the **Utilities** tab, click on **Settings** for "Use Target Driver for Flash Programming". Note the "RAM for Algorithm" area:<br/>
    ![RAM for Algorithm"](./images/ram_for_algorithm_area.png)
-   
+
 2. In the **Options for Target** dialog, define a Read/Write memory area that is not initialized and which does not overlap with the area from the first step.<br/>
 For example, split IRAM1 into two regions. Reduce size of IRAM1 by 0x800 and create an IRAM2 area with start 0x2001F800 and size 0x800. Enable **NoInit** for this IRAM2 region.<br/>
    ![Create RAM area](./images/create_iram2.png)
 
 
-3. In the <b>Options for Component Class 'Compiler'</b> dialog (opens with right-click on **EventRecorder.c** in the **Project** window), on the **Memory** tab, assign **Zero Initialized Data** to the IRAM2 region.
+3. In the **Options for Component Class 'CMSIS-View'** dialog (opens with right-click on **EventRecorder.c** in the **Project** window), on the **Memory** tab, assign **Zero Initialized Data** to the IRAM2 region.
     ![Create RAM area](./images/er_memory_location.png)
-	
+
 4. Build the application to place the Event Recorder data buffers to uninitialized RAM. You may verify the generated scatter
    file:
 	```
     ; *************************************************************
     ; *** Scatter-Loading Description File generated by uVision ***
     ; *************************************************************
-    
+
     LR_IROM1 0x00000000 0x00040000  {    ; load region size_region
       ER_IROM1 0x00000000 0x00040000  {  ; load address = execution address
        *.o (RESET, +First)
@@ -290,21 +326,20 @@ For example, split IRAM1 into two regions. Reduce size of IRAM1 by 0x800 and cre
       }
     }
     ```
-	
+
 \note
 - If the Event Recorder data buffer is not in uninitialized memory, the **Command** window of the debugger displays:
   "Warning: Event Recorder not located in uninitialized memory!".
-- <a target="_blank" href="https://www.keil.com/support/docs/4012.htm">Knowledgebase article 4012</a> explains how to create
-  custom memory areas in uVision.
+- <a target="_blank" href="https://developer.arm.com/documentation/ka003868/latest">Knowledgebase article 4012</a> explains how to create custom memory areas in uVision.
 - If your RAM is not big enough to separate the Event Recorder area from the Flash programming area, make sure that you
   enable "Reset and Run" for the **Download Function**:
   \image html reset_and_run.png
 - If this still produces broken Event Recorder records after a reset, a power-cycle of the target system will help.
-	
+
 
 ## Time Stamp Settings{#initial_timestamp}
 
-To avoid display problems in System Analyzer, set the <b>Time Stamp Clock Frequency [Hz]</b> to the initially expected
+To avoid display problems in System Analyzer, set the **Time Stamp Clock Frequency [Hz]** to the initially expected
 value:
 
 ![Event Recorder Configuration Wizard](./images/config_wizard.png)
@@ -331,35 +366,35 @@ To to stream dynamic event information, insert calls to the \ref EventRecorder_D
  - \ref EventRecord4 to record up to four 32-bit integer values.
 
 These \ref EventRecorder_Data functions receive as first parameter an *id* event identifier used for filtering and displaying. The macro \ref EventID may be used to compose *id* values to include *level* and *component* numbers.
- 
+
 **Example:**
-```
-#include "EventRecorder.h"                       // Keil::Compiler:Event Messaging
- 
+```C
+#include "EventRecorder.h"                       // ARM::CMSIS-View:Event Recorder
+
 int some_error = 0;                              // error flag
 char string[10] = "MyTest";                      // some test string
- 
+
 void MyFunction (int parameter) {
   EventRecord2 (1+EventLevelAPI, parameter, 0);              // Event at Start
     ;
   if (some_error)  {
     EventRecord2 (2+EventLevelError, 0, 0);                  // Event at Error
-    return;	
+    return;
   }
   EventRecordData (3+EventLevelOp, string, sizeof(string));  // Event at Finish
   return;
 }
- 
+
 int main (void) {
   EventRecorderInitialize (EventRecordAll, 1);	// initialize and start Event Recorder
- 
+
   MyFunction (0x10);
   some_error = 1;                               // set error flag
   MyFunction (0x60);
 }
 ```
 
-When executing this example in the µVision debugger, use the menu command <b>View - Analysis Windows - Event Recorder</b> to
+When executing this example in the µVision debugger, use the menu command **View - Analysis Windows - Event Recorder** to
 open the Event Recorder window. This should show the following output:
 
 ![Output shown in Event Recorder window](./images/EventOutput1.png "Output shown in Event Recorder window")
@@ -370,22 +405,22 @@ You may create an \ref SCVD_Format "*.SCVD (Software Component View Description)
 matches the application. The event output is created using the \ref elem_events.
 
 **SCVD file example**
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
- 
+
 <component_viewer schemaVersion="0.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="Component_Viewer.xsd">
   <component name="MyExample" version="1.0.0"/>    <!-- name and version of the component  -->
- 
+
     <events>
       <group name="My Events Group">
          <component name="MyApp"      brief="My Application"    no="0x00" prefix="EvrNetMM_"    info="Network - System - Dynamic Memory Management"/>
-      </group> 	
- 
+      </group>
+
       <event id="1" level="API"   property="MyFunction"        value="parameter=%x[val1]"     info="Event on start of MyFunction"  />
       <event id="2" level="Error" property="MyFunctionError"                                  info="Event on error in MyFunction" />
       <event id="3" level="Op"    property="MyFunctionProcess" value="string=%t[val1]"        info="Event on operation in MyFunction"  />
     </events>
- 
+
 </component_viewer>
 ```
 
@@ -397,34 +432,34 @@ The Event Recorder displays the events as shown below.
 
 ![Event Recorder output formatted with *.SCVD file](./images/EventOutput2.png "Event Recorder output formatted with *.SCVD file")
 
-The described groups and events also show up in the filter dialog. 
+The described groups and events also show up in the filter dialog.
 
 ![Event Recorder Filter dialog](./images/EventRecorderFilter.png "Event Recorder Filter dialog")
 
 ## Software Component Variants{#Debug_Variants}
 
-The software packs for MDK Middleware and CMSIS already contain SCVD files that match the related event annotations in the C
-source code. However, you need to select the right component <b>Variant</b>. For MDK Middleware, you need to select
+The software packs for MDK-Middleware and CMSIS already contain SCVD files that match the related event annotations in the C
+source code. However, you need to select the right component **Variant**. For MDK-Middleware, you need to select
 the **Debug** variants, whereas for Keil RTX5, you need to add the **Source** variant.
-  
-The example below enables event recording for the MDK-Middleware <b>File System</b> component:
+
+The example below enables event recording for the MDK-Middleware **File System** component:
 
 ![Select debug variant](./images/SelSWComp.png "Select debug variant")
 
 ## Redirecting printf output{#printf_redirect}
 
 The Event Recorder can be used to retarget printf output. This is especially interesting for targets without
-<a href="http://www2.keil.com/coresight/#swv">ITM</a>, such as Cortex-M0/M0+/M23. Steps to enable this:
- -# In the Manage Run-Time Environment window, set the component <b>Compiler:I/O:STDOUT</b> to use **Variant** *EVR*.
- -# Select the component <b>Compiler:Event Recorder</b> or use the **Resolve** button.
+ITM, such as Cortex-M0/M0+/M23. Steps to enable this:
+ -# In the Manage Run-Time Environment window, set the component **CMSIS-Compiler:I/O:STDOUT** to use **Variant** *EVR*.
+ -# Select the component **CMSIS-View:Event Recorder** or use the **Resolve** button.
  -# In the user code, include *EventRecorder.h* and call the `EventRecorderInitialize()` function in `main()`.
- 
-Refer to the example <b><a class="el" href="../../RetargetIO/html/_retarget__examples_er.html">Retarget STDOUT via Event Recorder</a></b> in "I/O Retargeting". 
+
+Refer to the example [Retarget STDOUT via Event Recorder](https://arm-software.github.io/CMSIS-Compiler/latest/Retarget_Examples_er.html).
 
 ## Event filtering{#er_filtering}
 
 Filtering for events reduces the amount of data transmitted from the target to the debugger. To filter for events, use the
-button <b>Configure Target Event Recording</b>:
+button **Configure Target Event Recording**:
 
 \image html filter_button.png
 
@@ -440,19 +475,16 @@ a host computer that is running a debugger.
 Examples of these facilities include keyboard input, screen output, and disk I/O. For example, you can use this mechanism to
 enable functions in the C library, such as `printf` and `scanf`, to use the screen and keyboard of the host instead of having a screen and keyboard on the target system.
 
-With the Event Recorder, you can use semihosting with models to write the events into a file on your PC. This works with Arm
-FastModels, Fixed Virtual Platforms, and Virtual Hardware alike. 
+With the Event Recorder, you can use semihosting with models to write the events into a file on your PC. This works with [Arm
+Fast Models](https://developer.arm.com/Tools%20and%20Software/Fast%20Models), [Arm Fixed Virtual Platforms](https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms), and [Arm Virtual Hardware](https://www.arm.com/products/development-tools/simulation/virtual-hardware) alike.
 
-The file that is written is called *EventRecorder.log* and is a binary file that is available in the root directory of the µVision project. A tool to read and decode the binary data is being developed.
-
-While the file is written to the hard drive of your PC, you can still use the Event Recorder window in µVision to see the
-events coming in.
+The file that is written is called *EventRecorder.log* and is a binary file that is available in the root directory of your project. Use \ref evntlst to read and decode the binary data.
 
 \note
-- The semihosting variant will not work with real target hardware. Instead, program execution will hit a breakpoint and stop
-  there.
 - Your model needs to be configured for semihosting (refer to the documentation of your modeling technology on how to do
   that).
 - You can specify a different name for the log file by specifying a define called `EVENT_LOG_FILENAME`.
-- Once you start a new debug session, the log file will be overwritten. While in debug, new messages will be appended to the
+- In µVision, once you start a new debug session, the log file will be overwritten. While in debug, new messages will be appended to the
   currently open log file.
+- In µVision, the semihosting variant will not work with real target hardware. Instead, program execution will hit a breakpoint and stop there.
+- In µVision, you can still use the Event Recorder window in µVision to see the events coming in while the file is written to the hard drive of your PC.

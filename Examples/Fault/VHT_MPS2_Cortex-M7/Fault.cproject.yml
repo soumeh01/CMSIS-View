@@ -1,0 +1,40 @@
+project:
+
+  packs:
+    - pack: ARM::CMSIS
+    - pack: ARM::CMSIS-Compiler
+    - pack: ARM::CMSIS-View
+
+  define:
+    - RTE_Compiler_EventRecorder
+    - RTE_Compiler_EventRecorder_DAP
+    - RTE_Compiler_EventRecorder_Semihosting
+
+  groups:
+    - group: Documentation
+      files:
+        - file: README.md
+
+    - group: Source Files
+      files:
+        - file: Fault.c
+        - file: ARM_FaultTrigger.c
+        - file: retarget_stdio.c
+
+  components:
+    - component: CMSIS:CORE
+    - component: CMSIS:RTOS2:Keil RTX5&Source
+
+    - component: CMSIS-Compiler:I/O:STDERR&User
+    - component: CMSIS-Compiler:I/O:STDOUT&User
+    - component: CMSIS-Compiler:I/O:STDIN&User
+
+    - component: CMSIS-View:Event Recorder&Semihosting
+    - component: CMSIS-View:Fault:Record
+    - component: CMSIS-View:Fault:Storage
+
+    - component: Board Support&V2M-MPS2:Common
+
+    - component: CMSIS Driver:USART
+
+    - component: Device:Startup&C Startup

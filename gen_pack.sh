@@ -7,7 +7,7 @@
 set -o pipefail
 
 # Set version of gen pack library
-REQUIRED_GEN_PACK_LIB="0.6.0"
+REQUIRED_GEN_PACK_LIB="0.7.0"
 
 # Set default command line arguments
 DEFAULT_ARGS=(-c "pack/")
@@ -22,6 +22,8 @@ PACK_BUILD=./build
 PACK_DIRS="
   Documentation
   EventRecorder
+  Examples
+  Fault
 "
 
 # Specify file names to be added to pack base directory
@@ -40,7 +42,10 @@ PACK_PATCH_FILES=""
 PACKCHK_ARGS=()
 
 # Specify additional dependencies for packchk
-PACKCHK_DEPS=""
+PACKCHK_DEPS="
+  ARM.V2M_MPS3_SSE_300_BSP.pdsc
+  Keil.B-U585I-IOT02A_BSP.pdsc
+"
 
 # Optional: restrict fallback modes for changelog generation
 # Default: full
